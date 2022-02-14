@@ -1,0 +1,204 @@
+// Copyright Team 35 2022
+#include <stdio.h>
+#include <stdlib.h>
+#define strmax 25
+#define stbmax 80
+
+void InitMatrix1(int arr[strmax][stbmax], int h, int w);  //  Инициализация значений матрицы
+int output1(int arr[strmax][stbmax], int h, int w);       //  Вывод значений матрицы
+void MainLogic(int arr[strmax][stbmax], int h, int w, int backup[strmax][stbmax]);  //  Вся логика
+int sosedi(int arr[strmax][stbmax], int x, int y);        // К-во соседей ячеек матрицы, кроме ее границ
+int sosediBorder(int arr[strmax][stbmax], int x, int y);  // К-во соседей границ ячеек матрицы
+
+int main() {
+    int arr[strmax][stbmax], backup[strmax][stbmax];
+    int h = 25, w = 80;
+    char c;
+    InitMatrix1(arr, h, w);
+    if (freopen("/dev/tty", "rw", stdin) == NULL)
+        printf("ERROR!!!");
+    c = getchar();
+    char temp;
+    while (c != 'q') {
+        c = getchar();
+        if (c == ' ') {
+          temp = getchar();
+          if (temp == '\n')
+        MainLogic(arr, h, w, backup);
+        }
+        system("clear");
+        output1(arr, h, w);
+    }
+}
+
+void InitMatrix1(int arr[strmax][stbmax], int h, int w) {
+    for (int  i = 0; i < h * w; i++) {
+        scanf("%1d" "rw", &arr[i/80][i%80]);
+    }
+}
+
+void MainLogic(int arr[strmax][stbmax], int h, int w, int backup[strmax][stbmax]) {
+    for (int  i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            backup[i][j] = arr[i][j];
+        }
+    }
+    for (int  i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            if (i > 0 && j > 0 && j < w-1 && i < h-1) {
+                if ((sosedi(arr, i, j) != 2 && sosedi(arr, i, j) != 3) && (arr[i][j] == 1)) {
+                    backup[i][j] = 0;
+                }
+                if ((sosedi(arr, i, j) == 3) && (arr[i][j] == 0)) {
+                    backup[i][j] = 1;
+                }
+            }
+            if (i == 0 || j == 0 || j == w-1 || i == h-1) {
+                if ((sosediBorder(arr, j, i) !=2 && sosediBorder(arr, j, i) !=3) && (arr[i][j] == 1)) {
+                    backup[i][j] = 0;
+                }
+                if ((sosediBorder(arr, j, i) == 3) && (arr[i][j] == 0)) {
+                    backup[i][j] = 1;
+                }
+            }
+        }
+    }
+    for (int  i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            arr[i][j] = backup[i][j];
+        }
+    }
+}
+
+int sosedi(int arr[strmax][stbmax], int x, int y) {
+  int kol;
+  if (arr[x][y] == 1) {
+      kol = -1;
+  } else {
+      kol = 0;
+  }
+  for (int  i = x - 1; i <= x + 1; i++) {
+      for (int j = y - 1; j <= y + 1; j++) {
+          if (arr[i][j] == 1)
+              kol++;
+      }
+  }
+    return kol;
+}
+
+int sosediBorder(int arr[strmax][stbmax], int x, int y) {
+    int check = 0, kol = 0;
+    if ((x == 0 && y == 0)  && check == 0) {
+        kol += arr[strmax - 1][stbmax - 1];
+        kol += arr[strmax - 1][0];
+        kol += arr[strmax - 1][1];
+        kol += arr[0][stbmax - 1];
+        kol += arr[1][stbmax - 1];
+        kol += arr[0][1];
+        kol += arr[1][0];
+        kol += arr[1][1];
+        check = 1;
+    }
+    if ((x == stbmax - 1 && y == 0)  && check == 0) {
+        kol += arr[strmax - 1][0];
+        kol += arr[strmax - 1][stbmax - 1];
+        kol += arr[strmax - 1][stbmax - 2];
+        kol += arr[0][0];
+        kol += arr[1][0];
+        kol += arr[0][stbmax - 2];
+        kol += arr[1][stbmax - 2];
+        kol += arr[1][stbmax - 1];
+        check = 1;
+    }
+    if ((x == 0 && y == strmax - 1)  && check == 0) {
+        kol += arr[0][stbmax - 1];
+        kol += arr[strmax - 1][stbmax - 1];
+        kol += arr[strmax - 2][stbmax - 1];
+        kol += arr[0][0];
+        kol += arr[0][1];
+        kol += arr[strmax - 1][1];
+        kol += arr[strmax - 2][0];
+        kol += arr[strmax - 2][1];
+        check = 1;
+    }
+    if ((x == stbmax - 1 && y == strmax - 1)  && check == 0) {
+        kol += arr[0][0];
+        kol += arr[strmax - 1][0];
+        kol += arr[strmax - 2][0];
+        kol += arr[0][stbmax - 1];
+        kol += arr[0][stbmax - 2];
+        kol += arr[strmax - 1][stbmax - 2];
+        kol += arr[strmax - 2][stbmax - 1];
+        kol += arr[strmax - 2][stbmax - 2];
+        check = 1;
+    }
+    if ((x == 0 && (y != strmax - 1 || y != strmax - 0))  && check == 0) {
+        kol += arr[y-1][0];
+        kol += arr[y+1][0];
+        kol += arr[y-1][1];
+        kol += arr[y+1][1];
+        kol += arr[y][1];
+        kol += arr[y-1][stbmax - 1];
+        kol += arr[y+1][stbmax - 1];
+        kol += arr[y][stbmax - 1];
+        check = 1;
+    }
+    if ((x == stbmax - 1 && (y != strmax - 1 || y != strmax - 0))  && check == 0) {
+        kol += arr[y-1][stbmax - 1];
+        kol += arr[y+1][stbmax - 1];
+        kol += arr[y-1][stbmax - 2];
+        kol += arr[y+1][stbmax - 2];
+        kol += arr[y][stbmax - 2];
+        kol += arr[y-1][0];
+        kol += arr[y+1][0];
+        kol += arr[y][0];
+        check = 1;
+    }
+    if ((y == strmax - 1 && (x != stbmax - 1 || x != strmax - 0))  && check == 0) {
+        kol += arr[strmax - 1][x - 1];
+        kol += arr[strmax - 1][x + 1];
+        kol += arr[strmax - 2][x - 1];
+        kol += arr[strmax - 2][x + 1];
+        kol += arr[strmax - 2][x];
+        kol += arr[0][x - 1];
+        kol += arr[0][x + 1];
+        kol += arr[0][x];
+        check = 1;
+    }
+    if ((y == 0 && (x != stbmax - 1 || x != strmax - 0))  && check == 0) {
+        kol += arr[strmax - 1][x - 1];
+        kol += arr[strmax - 1][x + 1];
+        kol += arr[strmax - 1][x];
+        kol += arr[1][x - 1];
+        kol += arr[1][x + 1];
+        kol += arr[0][x - 1];
+        kol += arr[0][x + 1];
+        kol += arr[1][x];
+        check = 1;
+    }
+    return kol;
+}
+
+int output1(int arr[strmax][stbmax], int h, int w) {
+    for (int j = 0; j < w; j++) {
+        printf("=");
+    }
+    printf("\n");
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            if (arr[i][j] == 1)
+                printf("*");
+            else
+                printf(" ");
+        }
+        if (i != h - 1)
+            printf("\n");
+    }
+    printf("\n");
+    for (int j = 0; j < w; j++) {
+        printf("=");
+    }
+    printf("\n");
+    return 0;
+}
+
